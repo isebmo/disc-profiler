@@ -160,7 +160,7 @@ export default function Results({ result, onRestart }: Props) {
       {/* Link to article */}
       <div className="text-center pb-8">
         <a
-          href="https://tfada.fr/disc"
+          href="https://mouret.pro/blog/comprendre-le-disc-et-mieux-communiquer/"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[#1A73E8] dark:text-[#8AB4F8] hover:underline font-medium"
