@@ -222,11 +222,19 @@ body {
 }
 
 .pip--done {
-  background: var(--color-disc-s);
+  background: #34A853;
+}
+
+.dark .pip--done {
+  background: #34A853;
 }
 
 .pip--active {
-  background: var(--color-disc-c);
+  background: #4285F4;
+}
+
+.dark .pip--active {
+  background: #4285F4;
 }
 
 /* ══════ Quiz Option ══════ */
