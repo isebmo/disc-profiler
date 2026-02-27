@@ -10,6 +10,9 @@ export default defineConfig({
   integrations: [react()],
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ['jspdf', 'html2canvas'],
+    },
   }
 });
