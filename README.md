@@ -1,43 +1,125 @@
-# Astro Starter Kit: Minimal
+# Test DISC
 
-```sh
-npm create astro@latest -- --template minimal
+Test de personnalite DISC en ligne, gratuit et sans inscription.
+Decouvre ton profil comportemental en quelques minutes avec des resultats detailles et des conseils personnalises.
+
+**https://disc.mouret.pro**
+
+## Fonctionnalites
+
+- **Quiz multi-phases** : questions Likert, choix forces (naturel/adapte), valeurs Spranger
+- **Phase adaptative** : questions supplementaires si les deux dimensions dominantes sont proches
+- **Resultats detailles** : profil DISC, position sur la roue (8 types), talents, communication, stress, indicateurs bipolaires, valeurs/motivations
+- **Comparaison** : superposition de deux profils en radar chart (`/compare`)
+- **Vue equipe** : visualisation des profils de toute une equipe (`/team`)
+- **Export PDF** : rapport complet telechargeble
+- **Partage par URL** : resultats encodes dans l'URL pour partage direct
+- **Bilingue** : francais / anglais
+- **Dark mode** : theme clair/sombre (auto-detecte ou manuel)
+
+## Stack technique
+
+| Couche | Techno |
+|---|---|
+| Framework | [Astro](https://astro.build) 5 |
+| UI | [React](https://react.dev) 19 |
+| Styles | [Tailwind CSS](https://tailwindcss.com) 4 |
+| Charts | [Chart.js](https://www.chartjs.org) + react-chartjs-2 |
+| Export | jsPDF + html2canvas |
+| Fonts | Google Fonts (DM Sans, Outfit) |
+| Deploiement | GitHub Pages |
+| Analytics | Umami |
+
+## Installation
+
+```bash
+# Cloner le repo
+git clone git@github.com:isebmo/disc-profiler.git
+cd disc-profiler
+
+# Installer les dependances
+npm install
+
+# Lancer le serveur de dev
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Le site est accessible sur `http://localhost:4321`.
 
-## 🚀 Project Structure
+## Scripts
 
-Inside of your Astro project, you'll see the following folders and files:
+| Commande | Description |
+|---|---|
+| `npm run dev` | Serveur de dev local (port 4321) |
+| `npm run build` | Build de production dans `./dist/` |
+| `npm run preview` | Preview du build en local |
+| `npm run og` | Genere `public/og.png` (1200x630) et `public/favicon-32.png` (32x32) |
+| `npm run astro` | CLI Astro (`astro add`, `astro check`, etc.) |
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+## Structure du projet
+
+```
+src/
+  pages/
+    index.astro          # Page principale (quiz)
+    compare.astro        # Comparaison de deux profils
+    team.astro           # Vue equipe
+  components/
+    App.tsx              # Orchestrateur principal (landing -> quiz -> resultats)
+    Landing.tsx          # Ecran d'accueil
+    Questionnaire.tsx    # Quiz multi-phases
+    Results.tsx          # Affichage des resultats (12 onglets)
+    RadarChart.tsx       # Radar chart DISC
+    WheelPosition.tsx    # Position sur la roue des 8 types
+    ExportPDF.tsx        # Export PDF du rapport
+    ShareButton.tsx      # Partage par URL
+    Compare.tsx          # Comparaison de profils
+    Team.tsx             # Vue equipe
+    ...
+  data/
+    questions.ts         # Questions, choix forces, paires Spranger
+    profiles.ts          # Profils visuels (couleurs, blobs SVG)
+    report-content.ts    # Contenu des rapports par type
+  lib/
+    scoring.ts           # Algorithmes de scoring et calcul du type
+    sharing.ts           # Encodage/decodage URL des resultats
+  i18n/
+    context.tsx          # Provider React FR/EN
+    translations.ts      # Traductions
+  layouts/
+    Layout.astro         # Layout HTML, meta tags OG/Twitter, theme
+  styles/
+    global.css           # Tailwind, tokens de theme, animations
+public/
+  og.png                 # Image Open Graph (1200x630)
+  favicon.svg            # Favicon SVG
+  favicon-32.png         # Favicon PNG 32x32
+  CNAME                  # Domaine custom
+scripts/
+  generate-og.mjs        # Generation des images OG et favicon PNG
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Deploiement
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Le deploiement est automatique via GitHub Actions sur chaque push sur `main` :
 
-Any static assets, like images, can be placed in the `public/` directory.
+1. `npm ci` + `npm run build`
+2. Upload de `dist/` vers GitHub Pages
+3. Domaine custom : `disc.mouret.pro` (via `public/CNAME`)
 
-## 🧞 Commands
+Le workflow est dans `.github/workflows/deploy.yml`.
 
-All commands are run from the root of the project, from a terminal:
+## Meta tags & partage social
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Le site inclut des meta tags complets pour un rendu propre sur toutes les plateformes de partage (LinkedIn, Slack, Discord, Twitter/X, iMessage, WhatsApp) :
 
-## 👀 Want to learn more?
+- Open Graph (`og:title`, `og:description`, `og:image`, `og:url`, `og:site_name`, `og:locale`)
+- Twitter Card (`summary_large_image`)
+- URL canonique (`<link rel="canonical">`)
+- `og:url` et `canonical` dynamiques par page via `Astro.url`
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Pour regenerer l'image OG : `npm run og`
+
+## Licence
+
+Projet prive.
