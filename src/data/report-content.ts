@@ -112,6 +112,16 @@ export const talents: ConditionalItem[] = [
   // More C talents
   { fr: 'Documente et formalise les bonnes pratiques', en: 'Documents and formalizes best practices', condition: (s) => veryHigh(s.C), priority: (s) => s.C - 7 },
   { fr: 'Repère les incohérences et les failles dans un raisonnement', en: 'Spots inconsistencies and flaws in reasoning', condition: (s) => veryHigh(s.C) && !low(s.D), priority: (s) => s.C - 8 },
+
+  // Universal fallbacks (always match, low priority)
+  { fr: 'Sait s\'adapter aux situations variées', en: 'Adapts to varied situations', condition: () => true, priority: () => 10 },
+  { fr: 'Apporte un regard personnel et unique aux projets', en: 'Brings a personal and unique perspective to projects', condition: () => true, priority: () => 9 },
+  { fr: 'Contribue positivement à la dynamique d\'équipe', en: 'Contributes positively to team dynamics', condition: () => true, priority: () => 8 },
+  { fr: 'Sait tirer parti de ses expériences passées', en: 'Leverages past experiences effectively', condition: () => true, priority: () => 7 },
+  { fr: 'Fait preuve de bonne volonté et d\'engagement', en: 'Shows goodwill and commitment', condition: () => true, priority: () => 6 },
+  { fr: 'Sait identifier ses forces et les mettre au service de l\'équipe', en: 'Identifies strengths and puts them at the service of the team', condition: () => true, priority: () => 5 },
+  { fr: 'Est capable de progresser rapidement quand on lui fait confiance', en: 'Progresses quickly when trusted', condition: () => true, priority: () => 4 },
+  { fr: 'Apporte une contribution fiable au quotidien', en: 'Provides reliable daily contributions', condition: () => true, priority: () => 3 },
 ];
 
 // ─── Environment (40 items) ──────────────────────────────────
@@ -168,6 +178,16 @@ export const environment: ConditionalItem[] = [
   { fr: 'Des responsabilités clairement définies', en: 'Clearly defined responsibilities', condition: (s) => high(s.C) || high(s.S), priority: (s) => Math.max(s.C, s.S) - 7 },
   { fr: 'Un management accessible et à l\'écoute', en: 'Accessible and attentive management', condition: (s) => high(s.S) && !high(s.D), priority: (s) => s.S - 6 },
   { fr: 'La possibilité de prendre du recul et de planifier', en: 'The opportunity to step back and plan', condition: (s) => high(s.C) && !veryHigh(s.D), priority: (s) => s.C - 9 },
+
+  // Universal fallbacks
+  { fr: 'Un environnement de travail respectueux et professionnel', en: 'A respectful and professional work environment', condition: () => true, priority: () => 10 },
+  { fr: 'Des objectifs clairs et un cadre bien défini', en: 'Clear objectives and a well-defined framework', condition: () => true, priority: () => 9 },
+  { fr: 'Un bon équilibre entre travail individuel et collectif', en: 'A good balance between individual and collective work', condition: () => true, priority: () => 8 },
+  { fr: 'Des opportunités d\'apprentissage et de développement', en: 'Learning and development opportunities', condition: () => true, priority: () => 7 },
+  { fr: 'Une communication transparente au sein de l\'équipe', en: 'Transparent communication within the team', condition: () => true, priority: () => 6 },
+  { fr: 'Un management qui reconnaît les contributions individuelles', en: 'Management that recognizes individual contributions', condition: () => true, priority: () => 5 },
+  { fr: 'La possibilité de contribuer de manière significative', en: 'The ability to contribute meaningfully', condition: () => true, priority: () => 4 },
+  { fr: 'Un rythme de travail soutenable sur la durée', en: 'A sustainable work pace over time', condition: () => true, priority: () => 3 },
 ];
 
 // ─── Communication Do (40 items) ─────────────────────────────
@@ -221,6 +241,16 @@ export const communicationDo: ConditionalItem[] = [
   { fr: 'Soyez cohérent et fiable dans vos engagements', en: 'Be consistent and reliable in your commitments', condition: (s) => high(s.S) || high(s.C), priority: (s) => Math.max(s.S, s.C) - 7 },
   { fr: 'Posez des questions ouvertes pour mieux comprendre ses besoins', en: 'Ask open questions to better understand their needs', condition: (s) => high(s.S) && moderate(s.I), priority: (s) => s.S - 6 },
   { fr: 'Tenez vos promesses et respectez les délais annoncés', en: 'Keep your promises and respect announced deadlines', condition: (s) => high(s.C) && high(s.S), priority: (s) => (s.C + s.S) / 2 - 5 },
+
+  // Universal fallbacks
+  { fr: 'Soyez clair et transparent dans vos intentions', en: 'Be clear and transparent about your intentions', condition: () => true, priority: () => 10 },
+  { fr: 'Écoutez activement avant de répondre', en: 'Listen actively before responding', condition: () => true, priority: () => 9 },
+  { fr: 'Montrez du respect pour son point de vue', en: 'Show respect for their perspective', condition: () => true, priority: () => 8 },
+  { fr: 'Exprimez vos attentes de façon explicite', en: 'Express your expectations explicitly', condition: () => true, priority: () => 7 },
+  { fr: 'Soyez authentique et sincère dans vos échanges', en: 'Be authentic and sincere in your exchanges', condition: () => true, priority: () => 6 },
+  { fr: 'Adaptez votre rythme et votre ton à la situation', en: 'Adapt your pace and tone to the situation', condition: () => true, priority: () => 5 },
+  { fr: 'Privilégiez le dialogue constructif', en: 'Favor constructive dialogue', condition: () => true, priority: () => 4 },
+  { fr: 'Reconnaissez ses efforts et ses contributions', en: 'Acknowledge their efforts and contributions', condition: () => true, priority: () => 3 },
 ];
 
 // ─── Communication Don't (40 items) ──────────────────────────
@@ -274,6 +304,16 @@ export const communicationDont: ConditionalItem[] = [
   { fr: 'Ne rejetez pas ses idées sans les avoir considérées', en: 'Don\'t dismiss their ideas without considering them', condition: (s) => high(s.I) && !low(s.C), priority: (s) => s.I - 6 },
   { fr: 'Évitez de lui donner des ordres — préférez les suggestions', en: 'Avoid giving orders — prefer suggestions', condition: (s) => high(s.D) && moderate(s.S), priority: (s) => s.D - 5 },
   { fr: 'Ne faites pas de promesses que vous ne pourrez pas tenir', en: 'Don\'t make promises you can\'t keep', condition: (s) => high(s.S) && high(s.C), priority: (s) => (s.S + s.C) / 2 - 6 },
+
+  // Universal fallbacks
+  { fr: 'Ne faites pas de suppositions sur ses intentions', en: 'Don\'t make assumptions about their intentions', condition: () => true, priority: () => 10 },
+  { fr: 'Ne le jugez pas trop rapidement', en: 'Don\'t judge them too quickly', condition: () => true, priority: () => 9 },
+  { fr: 'Ne manquez pas de respect envers son travail', en: 'Don\'t disrespect their work', condition: () => true, priority: () => 8 },
+  { fr: 'N\'ignorez pas ses besoins au profit des vôtres', en: 'Don\'t ignore their needs in favor of yours', condition: () => true, priority: () => 7 },
+  { fr: 'Ne communiquez pas uniquement par écrit pour les sujets importants', en: 'Don\'t communicate only in writing for important topics', condition: () => true, priority: () => 6 },
+  { fr: 'Évitez les messages contradictoires', en: 'Avoid contradictory messages', condition: () => true, priority: () => 5 },
+  { fr: 'Ne remettez pas en cause sa compétence sans fondement', en: 'Don\'t question their competence without grounds', condition: () => true, priority: () => 4 },
+  { fr: 'Évitez de reporter indéfiniment les décisions', en: 'Avoid postponing decisions indefinitely', condition: () => true, priority: () => 3 },
 ];
 
 // ─── Motivation Keys (50 items) ──────────────────────────────
@@ -338,6 +378,16 @@ export const motivationKeys: ConditionalItem[] = [
   { fr: 'Partager ses connaissances et former les autres', en: 'Sharing knowledge and training others', condition: (s) => high(s.I) && high(s.C), priority: (s) => (s.I + s.C) / 2 - 4 },
   { fr: 'Se sentir en sécurité dans son poste et son rôle', en: 'Feeling secure in one\'s position and role', condition: (s) => veryHigh(s.S) && low(s.D), priority: (s) => s.S - 3 },
   { fr: 'Avoir les moyens et outils nécessaires pour bien travailler', en: 'Having the necessary resources and tools to work well', condition: (s) => high(s.C) && moderate(s.D), priority: (s) => s.C - 8 },
+
+  // Universal fallbacks
+  { fr: 'Sentir que son travail a du sens et contribue à quelque chose', en: 'Feeling that one\'s work has meaning and contributes', condition: () => true, priority: () => 10 },
+  { fr: 'Être traité avec équité et respect', en: 'Being treated fairly and with respect', condition: () => true, priority: () => 9 },
+  { fr: 'Avoir des perspectives d\'évolution claires', en: 'Having clear growth prospects', condition: () => true, priority: () => 8 },
+  { fr: 'Travailler dans une ambiance positive et bienveillante', en: 'Working in a positive and supportive atmosphere', condition: () => true, priority: () => 7 },
+  { fr: 'Être encouragé et soutenu dans ses efforts', en: 'Being encouraged and supported in one\'s efforts', condition: () => true, priority: () => 6 },
+  { fr: 'Disposer d\'un cadre de travail clair et organisé', en: 'Having a clear and organized work framework', condition: () => true, priority: () => 5 },
+  { fr: 'Pouvoir compter sur ses collègues', en: 'Being able to rely on colleagues', condition: () => true, priority: () => 4 },
+  { fr: 'Recevoir de la reconnaissance pour ses efforts', en: 'Receiving recognition for one\'s efforts', condition: () => true, priority: () => 3 },
 ];
 
 // ─── Improvement Areas (50 items) ────────────────────────────
@@ -391,9 +441,7 @@ export const improvementAreas: ConditionalItem[] = [
   // Moderate
   { fr: 'Identifier plus clairement ses priorités et s\'y tenir', en: 'More clearly identify priorities and stick to them', condition: (s) => moderate(s.D) && moderate(s.C), priority: () => 38 },
   { fr: 'Travailler la communication assertive', en: 'Work on assertive communication', condition: (s) => moderate(s.D) && moderate(s.I), priority: () => 36 },
-  { fr: 'Développer la conscience de soi et de ses réactions sous stress', en: 'Develop self-awareness and stress reactions', condition: () => true, priority: () => 30 },
   { fr: 'Apprendre à demander de l\'aide quand nécessaire', en: 'Learn to ask for help when needed', condition: (s) => high(s.S) || (high(s.C) && low(s.I)), priority: (s) => Math.max(s.S, s.C) - 8 },
-  { fr: 'Développer la capacité d\'adaptation à différents interlocuteurs', en: 'Develop adaptability to different communication styles', condition: () => true, priority: () => 28 },
 
   // Extra
   { fr: 'Accepter les compliments et les retours positifs', en: 'Accept compliments and positive feedback', condition: (s) => high(s.C) && low(s.I), priority: (s) => s.C - 8 },
@@ -401,6 +449,16 @@ export const improvementAreas: ConditionalItem[] = [
   { fr: 'Ne pas se comparer systématiquement aux autres', en: 'Don\'t systematically compare yourself to others', condition: (s) => high(s.D) || high(s.C), priority: (s) => Math.max(s.D, s.C) - 9 },
   { fr: 'Apprendre à prioriser l\'essentiel sur l\'urgent', en: 'Learn to prioritize the essential over the urgent', condition: (s) => high(s.D) && !high(s.C), priority: (s) => s.D - 7 },
   { fr: 'Cultiver la gratitude pour ce qui fonctionne bien', en: 'Cultivate gratitude for what works well', condition: (s) => high(s.C) && high(s.D), priority: (s) => (s.C + s.D) / 2 - 6 },
+
+  // Universal fallbacks
+  { fr: 'Développer la conscience de soi et de ses réactions sous stress', en: 'Develop self-awareness and stress reactions', condition: () => true, priority: () => 10 },
+  { fr: 'Développer la capacité d\'adaptation à différents interlocuteurs', en: 'Develop adaptability to different communication styles', condition: () => true, priority: () => 9 },
+  { fr: 'Apprendre à mieux gérer son énergie au quotidien', en: 'Learn to better manage daily energy', condition: () => true, priority: () => 8 },
+  { fr: 'Pratiquer la communication assertive et bienveillante', en: 'Practice assertive and kind communication', condition: () => true, priority: () => 7 },
+  { fr: 'Développer l\'écoute active dans les échanges', en: 'Develop active listening in conversations', condition: () => true, priority: () => 6 },
+  { fr: 'Oser sortir de sa zone de confort de temps en temps', en: 'Dare to step out of one\'s comfort zone from time to time', condition: () => true, priority: () => 5 },
+  { fr: 'Cultiver la patience envers soi-même et les autres', en: 'Cultivate patience toward oneself and others', condition: () => true, priority: () => 4 },
+  { fr: 'Apprendre à célébrer les petites victoires', en: 'Learn to celebrate small wins', condition: () => true, priority: () => 3 },
 ];
 
 // ─── Narrative Descriptions (8 wheel types) ──────────────────
