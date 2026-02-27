@@ -68,13 +68,30 @@ function TeamInner() {
   const handleShare = async () => {
     if (members.length === 0) return;
     const encoded = encodeTeam(members);
-    const shareUrl = new URL(window.location.href.split('?')[0]);
-    shareUrl.searchParams.set('t', encoded);
+    const teamUrl = new URL(window.location.href.split('?')[0]);
+    teamUrl.searchParams.set('t', encoded);
+    const url = teamUrl.toString();
+
+    // Use native Web Share API if available
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: t.team.title,
+          text: t.team.subtitle,
+          url,
+        });
+        return;
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return;
+      }
+    }
+
+    // Fallback: copy to clipboard
     try {
-      await navigator.clipboard.writeText(shareUrl.toString());
+      await navigator.clipboard.writeText(url);
     } catch {
       const input = document.createElement('input');
-      input.value = shareUrl.toString();
+      input.value = url;
       document.body.appendChild(input);
       input.select();
       document.execCommand('copy');

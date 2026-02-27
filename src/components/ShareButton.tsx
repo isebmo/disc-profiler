@@ -11,8 +11,25 @@ export default function ShareButton({ scores }: Props) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleShare = async () => {
     const url = getShareUrl(scores);
+
+    // Use native Web Share API if available (mobile, some desktop browsers)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: t.results.title,
+          text: t.results.subtitle,
+          url,
+        });
+        return;
+      } catch (err) {
+        // User cancelled or share failed — fall through to clipboard
+        if (err instanceof Error && err.name === 'AbortError') return;
+      }
+    }
+
+    // Fallback: copy to clipboard
     try {
       await navigator.clipboard.writeText(url);
     } catch {
@@ -28,7 +45,7 @@ export default function ShareButton({ scores }: Props) {
   };
 
   return (
-    <button onClick={handleCopy} className="btn btn--primary btn--lg">
+    <button onClick={handleShare} className="btn btn--primary btn--lg">
       {copied ? (
         <>
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
