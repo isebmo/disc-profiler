@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { useI18n } from '../i18n/context';
 import type { DISCResult } from '../lib/scoring';
 import { generateReport } from '../lib/scoring';
@@ -30,7 +30,11 @@ const TAB_IDS: TabId[] = [
 export default function Results({ result, onRestart }: Props) {
   const { t, locale } = useI18n();
   const pdfRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   const report = useMemo(() => generateReport(result, locale), [result, locale]);
   const content = useMemo(
@@ -38,7 +42,91 @@ export default function Results({ result, onRestart }: Props) {
     [result.normalizedScores, locale, report.wheelType],
   );
 
-  const dominantProfile = profiles[result.dominant];
+  const activeIndex = TAB_IDS.indexOf(activeTab);
+  const isFirst = activeIndex === 0;
+  const isLast = activeIndex === TAB_IDS.length - 1;
+
+  const goTo = useCallback((tabId: TabId) => {
+    setActiveTab(tabId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const goPrev = useCallback(() => {
+    if (!isFirst) goTo(TAB_IDS[activeIndex - 1]);
+  }, [activeIndex, isFirst, goTo]);
+
+  const goNext = useCallback(() => {
+    if (!isLast) goTo(TAB_IDS[activeIndex + 1]);
+  }, [activeIndex, isLast, goTo]);
+
+  // ── Scroll indicators for tab bar ──
+  const updateScrollIndicators = useCallback(() => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    updateScrollIndicators();
+    el.addEventListener('scroll', updateScrollIndicators, { passive: true });
+    window.addEventListener('resize', updateScrollIndicators);
+    return () => {
+      el.removeEventListener('scroll', updateScrollIndicators);
+      window.removeEventListener('resize', updateScrollIndicators);
+    };
+  }, [updateScrollIndicators]);
+
+  // ── Auto-scroll active tab into view ──
+  useEffect(() => {
+    const container = tabsScrollRef.current;
+    if (!container) return;
+    const activeBtn = container.querySelector('[data-active="true"]') as HTMLElement | null;
+    if (activeBtn) {
+      const left = activeBtn.offsetLeft - container.offsetLeft - container.clientWidth / 2 + activeBtn.clientWidth / 2;
+      container.scrollTo({ left, behavior: 'smooth' });
+    }
+  }, [activeTab]);
+
+  // ── Swipe gesture on tab content ──
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+
+    const onTouchStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      tracking = true;
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!tracking) return;
+      tracking = false;
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      // Only trigger if horizontal swipe is dominant and large enough
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        if (dx < 0 && activeIndex < TAB_IDS.length - 1) {
+          goTo(TAB_IDS[activeIndex + 1]);
+        } else if (dx > 0 && activeIndex > 0) {
+          goTo(TAB_IDS[activeIndex - 1]);
+        }
+      }
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [activeIndex, goTo]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
@@ -58,60 +146,116 @@ export default function Results({ result, onRestart }: Props) {
         <p className="text-[#5F6368] dark:text-[#9AA0A6]">{t.results.subtitle}</p>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="mb-8 -mx-4 px-4 overflow-x-auto">
-        <div className="flex gap-1 min-w-max p-1 bg-[#F1F3F4] dark:bg-[#3C4043] rounded-2xl">
-          {TAB_IDS.map((tabId) => {
-            const isActive = activeTab === tabId;
-            return (
-              <button
-                key={tabId}
-                onClick={() => setActiveTab(tabId)}
-                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                  isActive
-                    ? 'bg-white dark:bg-[#303134] text-[#202124] dark:text-white shadow-sm'
-                    : 'text-[#5F6368] dark:text-[#9AA0A6] hover:text-[#202124] dark:hover:text-white'
-                }`}
-              >
-                {t.report.tabs[tabId]}
-              </button>
-            );
-          })}
+      {/* Tab Navigation with scroll indicators */}
+      <div className="relative mb-8 -mx-4 px-4">
+        {/* Left fade */}
+        {canScrollLeft && (
+          <div className="absolute left-4 top-0 bottom-0 w-8 z-10 pointer-events-none rounded-l-2xl bg-gradient-to-r from-[#F1F3F4] dark:from-[#3C4043] to-transparent" />
+        )}
+        {/* Right fade + chevron hint */}
+        {canScrollRight && (
+          <div className="absolute right-4 top-0 bottom-0 w-10 z-10 pointer-events-none rounded-r-2xl bg-gradient-to-l from-[#F1F3F4] dark:from-[#3C4043] to-transparent flex items-center justify-end pr-1">
+            <svg className="w-4 h-4 text-[#5F6368] dark:text-[#9AA0A6] animate-pulse" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          </div>
+        )}
+
+        <div
+          ref={tabsScrollRef}
+          className="overflow-x-auto scrollbar-hide"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          <div className="flex gap-1 min-w-max p-1 bg-[#F1F3F4] dark:bg-[#3C4043] rounded-2xl">
+            {TAB_IDS.map((tabId) => {
+              const isActive = activeTab === tabId;
+              return (
+                <button
+                  key={tabId}
+                  data-active={isActive}
+                  onClick={() => goTo(tabId)}
+                  className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                    isActive
+                      ? 'bg-white dark:bg-[#303134] text-[#202124] dark:text-white shadow-sm'
+                      : 'text-[#5F6368] dark:text-[#9AA0A6] hover:text-[#202124] dark:hover:text-white'
+                  }`}
+                >
+                  {t.report.tabs[tabId]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Tab counter */}
+        <div className="text-center mt-2 text-xs text-[#9AA0A6] dark:text-[#5F6368]">
+          {activeIndex + 1} / {TAB_IDS.length}
         </div>
       </div>
 
-      {/* Tab Content */}
-      <div ref={pdfRef}>
-        {activeTab === 'overview' && (
-          <TabOverview result={result} report={report} content={content} />
-        )}
-        {activeTab === 'profile' && (
-          <TabProfile report={report} content={content} />
-        )}
-        {activeTab === 'talents' && (
-          <TabTalents content={content} dominant={result.dominant} />
-        )}
-        {activeTab === 'environment' && (
-          <TabEnvironment content={content} dominant={result.dominant} />
-        )}
-        {activeTab === 'perceptions' && (
-          <TabPerceptions report={report} />
-        )}
-        {activeTab === 'communication' && (
-          <TabCommunication content={content} dominant={result.dominant} />
-        )}
-        {activeTab === 'motivation' && (
-          <TabMotivation content={content} dominant={result.dominant} />
-        )}
-        {activeTab === 'improvement' && (
-          <TabImprovement content={content} dominant={result.dominant} />
-        )}
-        {activeTab === 'indicators' && (
-          <TabIndicators report={report} />
-        )}
-        {activeTab === 'opposite' && (
-          <TabOpposite report={report} content={content} dominant={result.dominant} />
-        )}
+      {/* Tab Content (swipeable) */}
+      <div ref={contentRef}>
+        <div ref={pdfRef}>
+          {activeTab === 'overview' && (
+            <TabOverview result={result} report={report} content={content} />
+          )}
+          {activeTab === 'profile' && (
+            <TabProfile report={report} content={content} />
+          )}
+          {activeTab === 'talents' && (
+            <TabTalents content={content} dominant={result.dominant} />
+          )}
+          {activeTab === 'environment' && (
+            <TabEnvironment content={content} dominant={result.dominant} />
+          )}
+          {activeTab === 'perceptions' && (
+            <TabPerceptions report={report} />
+          )}
+          {activeTab === 'communication' && (
+            <TabCommunication content={content} dominant={result.dominant} />
+          )}
+          {activeTab === 'motivation' && (
+            <TabMotivation content={content} dominant={result.dominant} />
+          )}
+          {activeTab === 'improvement' && (
+            <TabImprovement content={content} dominant={result.dominant} />
+          )}
+          {activeTab === 'indicators' && (
+            <TabIndicators report={report} />
+          )}
+          {activeTab === 'opposite' && (
+            <TabOpposite report={report} content={content} dominant={result.dominant} />
+          )}
+        </div>
+      </div>
+
+      {/* Prev / Next navigation */}
+      <div className="flex items-center justify-between mt-8 gap-4">
+        <button
+          onClick={goPrev}
+          disabled={isFirst}
+          className={`btn btn--outline flex items-center gap-2 ${isFirst ? 'opacity-30 cursor-not-allowed' : ''}`}
+        >
+          <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+          {!isFirst && t.report.tabs[TAB_IDS[activeIndex - 1]]}
+        </button>
+
+        <span className="text-xs text-[#9AA0A6] dark:text-[#5F6368] hidden sm:block">
+          {activeIndex + 1} / {TAB_IDS.length}
+        </span>
+
+        <button
+          onClick={goNext}
+          disabled={isLast}
+          className={`btn btn--outline flex items-center gap-2 ${isLast ? 'opacity-30 cursor-not-allowed' : ''}`}
+        >
+          {!isLast && t.report.tabs[TAB_IDS[activeIndex + 1]]}
+          <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+          </svg>
+        </button>
       </div>
 
       {/* Actions */}

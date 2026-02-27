@@ -508,6 +508,11 @@ body {
   animation: fadeUp 0.4s var(--ease-out) forwards;
 }
 
+/* ══════ Scrollbar Hide ══════ */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes blobFloat {
   0% {
     transform: translate(0, 0) scale(1) rotate(0deg);
