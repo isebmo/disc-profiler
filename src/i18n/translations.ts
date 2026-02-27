@@ -29,6 +29,14 @@ export interface Translation {
     likert: string[];
     adaptiveIntro: string;
     adaptiveSubtitle: string;
+    forcedChoiceIntro: string;
+    forcedChoiceSubtitle: string;
+    forcedChoiceMost: string;
+    forcedChoiceLeast: string;
+    forcedChoiceInstruction: string;
+    valuesIntro: string;
+    valuesSubtitle: string;
+    valuesQuestion: string;
   };
   results: {
     title: string;
@@ -82,6 +90,8 @@ export interface Translation {
       improvement: string;
       indicators: string;
       opposite: string;
+      comparison: string;
+      values: string;
     };
     overview: {
       yourType: string;
@@ -128,6 +138,21 @@ export interface Translation {
       subtitle: string;
       interactTitle: string;
     };
+    comparison: {
+      title: string;
+      subtitle: string;
+      adapted: string;
+      natural: string;
+      delta: string;
+      deltaSubtitle: string;
+      stressWarning: string;
+    };
+    values: {
+      title: string;
+      subtitle: string;
+      motivations: string;
+      bipolarTitle: string;
+    };
   };
   loading: string;
   questions: Record<number, string>;
@@ -143,9 +168,9 @@ export const translations: Record<Locale, Translation> = {
     nav: { test: 'Le test', compare: 'Comparer', team: 'Équipe' },
     landing: {
       title: 'Découvre ton profil DISC',
-      subtitle: 'Réponds à 24 questions rapides et découvre ton style comportemental dominant. Gratuit, sans inscription, résultats immédiats.',
+      subtitle: 'Réponds à des questions rapides et découvre ton style comportemental, tes motivations et tes talents. Gratuit, sans inscription, résultats immédiats.',
       cta: 'Découvrir mon profil',
-      duration: '~ 3 minutes · 24 questions · 100% gratuit',
+      duration: '~ 8 minutes · 3 parties · 100% gratuit',
       dims: {
         D: 'Action & résultats',
         I: 'Communication & enthousiasme',
@@ -162,6 +187,14 @@ export const translations: Record<Locale, Translation> = {
       likert: ["Pas du tout d'accord", "Plutôt pas d'accord", 'Neutre', "Plutôt d'accord", "Tout à fait d'accord"],
       adaptiveIntro: 'Tes scores sont très proches entre deux profils.',
       adaptiveSubtitle: 'Quelques questions supplémentaires vont nous aider à affiner ton résultat.',
+      forcedChoiceIntro: 'Passons à la deuxième partie !',
+      forcedChoiceSubtitle: 'Choisis le mot qui te ressemble LE PLUS et celui qui te ressemble LE MOINS dans chaque groupe.',
+      forcedChoiceMost: 'Le plus',
+      forcedChoiceLeast: 'Le moins',
+      forcedChoiceInstruction: 'Sélectionne un mot pour "le plus" et un pour "le moins"',
+      valuesIntro: 'Dernière partie : tes motivations !',
+      valuesSubtitle: 'Pour chaque paire, choisis la phrase qui te parle le plus. Il n\'y a pas de bonne ou mauvaise réponse.',
+      valuesQuestion: 'Qu\'est-ce qui te parle le plus ?',
     },
     results: {
       title: 'Ton profil DISC',
@@ -215,6 +248,8 @@ export const translations: Record<Locale, Translation> = {
         improvement: 'Amélioration',
         indicators: 'Indicateurs',
         opposite: 'Votre opposé',
+        comparison: 'Naturel vs Adapté',
+        values: 'Valeurs',
       },
       overview: {
         yourType: 'Votre type',
@@ -260,6 +295,21 @@ export const translations: Record<Locale, Translation> = {
         title: 'Votre profil opposé',
         subtitle: 'Le type diamétralement opposé au vôtre sur la roue DISC',
         interactTitle: 'Comment mieux interagir avec votre opposé',
+      },
+      comparison: {
+        title: 'Style Naturel vs Style Adapté',
+        subtitle: 'Comparaison entre votre comportement naturel (profond) et votre comportement adapté (projeté)',
+        adapted: 'Style Adapté',
+        natural: 'Style Naturel',
+        delta: 'Écarts (Delta)',
+        deltaSubtitle: 'Différences entre votre style adapté et naturel par dimension',
+        stressWarning: 'Un écart important peut être source de tension si cette adaptation est subie plutôt que choisie.',
+      },
+      values: {
+        title: 'Vos motivations (Valeurs de Spranger)',
+        subtitle: 'Ce qui vous anime profondément et guide vos décisions',
+        motivations: 'Vos motivations principales',
+        bipolarTitle: 'Indicateurs de valeurs',
       },
     },
     loading: 'Analyse de ton profil en cours…',
@@ -342,9 +392,9 @@ export const translations: Record<Locale, Translation> = {
     nav: { test: 'Take the test', compare: 'Compare', team: 'Team' },
     landing: {
       title: 'Discover your DISC profile',
-      subtitle: 'Answer 24 quick questions and discover your dominant behavioral style. Free, no sign-up, instant results.',
+      subtitle: 'Answer quick questions and discover your behavioral style, motivations, and talents. Free, no sign-up, instant results.',
       cta: 'Discover my profile',
-      duration: '~ 3 minutes · 24 questions · 100% free',
+      duration: '~ 8 minutes · 3 parts · 100% free',
       dims: {
         D: 'Action & results',
         I: 'Communication & enthusiasm',
@@ -361,6 +411,14 @@ export const translations: Record<Locale, Translation> = {
       likert: ['Strongly disagree', 'Somewhat disagree', 'Neutral', 'Somewhat agree', 'Strongly agree'],
       adaptiveIntro: 'Your scores are very close between two profiles.',
       adaptiveSubtitle: 'A few extra questions will help us refine your result.',
+      forcedChoiceIntro: "Let's move to part two!",
+      forcedChoiceSubtitle: 'Pick the word that is MOST like you and the one that is LEAST like you in each group.',
+      forcedChoiceMost: 'Most',
+      forcedChoiceLeast: 'Least',
+      forcedChoiceInstruction: 'Select one word for "most" and one for "least"',
+      valuesIntro: 'Final part: your motivations!',
+      valuesSubtitle: "For each pair, choose the statement that resonates most with you. There are no right or wrong answers.",
+      valuesQuestion: 'Which resonates more with you?',
     },
     results: {
       title: 'Your DISC profile',
@@ -414,6 +472,8 @@ export const translations: Record<Locale, Translation> = {
         improvement: 'Improvement',
         indicators: 'Indicators',
         opposite: 'Your opposite',
+        comparison: 'Natural vs Adapted',
+        values: 'Values',
       },
       overview: {
         yourType: 'Your type',
@@ -459,6 +519,21 @@ export const translations: Record<Locale, Translation> = {
         title: 'Your opposite profile',
         subtitle: 'The type diametrically opposite to yours on the DISC wheel',
         interactTitle: 'How to better interact with your opposite',
+      },
+      comparison: {
+        title: 'Natural Style vs Adapted Style',
+        subtitle: 'Comparison between your natural behavior (deep) and your adapted behavior (projected)',
+        adapted: 'Adapted Style',
+        natural: 'Natural Style',
+        delta: 'Gaps (Delta)',
+        deltaSubtitle: 'Differences between your adapted and natural style per dimension',
+        stressWarning: 'A significant gap can be a source of tension if this adaptation is involuntary rather than chosen.',
+      },
+      values: {
+        title: 'Your Motivations (Spranger Values)',
+        subtitle: 'What deeply drives you and guides your decisions',
+        motivations: 'Your main motivations',
+        bipolarTitle: 'Value indicators',
       },
     },
     loading: 'Analyzing your profile…',

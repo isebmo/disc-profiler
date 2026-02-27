@@ -1,4 +1,4 @@
-import type { Dimension, Question } from '../data/questions';
+import type { Dimension, Question, ForcedChoiceGroup, SprangerMotivation, SprangerPair } from '../data/questions';
 
 export interface Scores {
   D: number;
@@ -51,6 +51,40 @@ export interface DISCReport {
   perceptions: Perceptions;
   /** Primary and secondary dimensions, sorted by score descending */
   sortedDimensions: { dim: Dimension; score: number }[];
+  /** Natural scores from forced-choice (Phase 2) */
+  naturalScores?: Scores;
+  /** Deltas: adapted - natural per dimension */
+  deltas?: Scores;
+  /** Interpretation of each delta */
+  deltaInterpretations?: DeltaInterpretation[];
+  /** Spranger values result (Phase 3) */
+  valuesResult?: ValuesResult;
+}
+
+/** Delta interpretation for a single dimension */
+export interface DeltaInterpretation {
+  dimension: Dimension;
+  delta: number;
+  level: 'low' | 'moderate' | 'high' | 'very-high';
+  direction: 'increase' | 'decrease' | 'stable';
+  text: { fr: string; en: string };
+}
+
+/** Spranger values scores */
+export interface SprangerScores {
+  cognitive: number;
+  aesthetic: number;
+  utilitarian: number;
+  altruistic: number;
+  individual: number;
+  traditional: number;
+}
+
+/** Full values result with bipolar indicators */
+export interface ValuesResult {
+  scores: SprangerScores;
+  bipolarIndicators: BipolarIndicator[];
+  sortedValues: { key: SprangerMotivation; label: { fr: string; en: string }; score: number }[];
 }
 
 // ─── Core scoring (unchanged) ────────────────────────────────
@@ -317,8 +351,14 @@ export function generatePerceptions(
 
 /**
  * Generate a full enriched DISC report from a DISCResult.
+ * Optionally includes Natural scores and Values if provided.
  */
-export function generateReport(result: DISCResult, locale: 'fr' | 'en'): DISCReport {
+export function generateReport(
+  result: DISCResult,
+  locale: 'fr' | 'en',
+  naturalScores?: Scores,
+  valuesResult?: ValuesResult,
+): DISCReport {
   const scores = result.normalizedScores;
   const { type: wheelType, position: wheelPosition } = getWheelType(scores);
 
@@ -329,7 +369,7 @@ export function generateReport(result: DISCResult, locale: 'fr' | 'en'): DISCRep
     .sort((a, b) => b[1] - a[1])
     .map(([dim, score]) => ({ dim, score }));
 
-  return {
+  const report: DISCReport = {
     result,
     wheelType,
     wheelPosition,
@@ -339,4 +379,219 @@ export function generateReport(result: DISCResult, locale: 'fr' | 'en'): DISCRep
     perceptions: generatePerceptions(scores, locale),
     sortedDimensions,
   };
+
+  if (naturalScores) {
+    report.naturalScores = naturalScores;
+    const { deltas, interpretations } = calculateDeltas(scores, naturalScores, locale);
+    report.deltas = deltas;
+    report.deltaInterpretations = interpretations;
+  }
+
+  if (valuesResult) {
+    report.valuesResult = valuesResult;
+  }
+
+  return report;
+}
+
+// ─── Natural Scores from Forced-Choice (Phase 2) ────────────
+
+/**
+ * Calculate Natural DISC scores from forced-choice answers.
+ * Most picks indicate conscious projection (Adapted).
+ * Least picks (inverted) reveal the Natural style.
+ * Score = normalize((most_count - least_count + total) / (2 * total)) * 100
+ */
+export function calculateNaturalScores(
+  answers: Record<number, { most: number; least: number }>,
+  groups: ForcedChoiceGroup[],
+): Scores {
+  const mostCount: Scores = { D: 0, I: 0, S: 0, C: 0 };
+  const leastCount: Scores = { D: 0, I: 0, S: 0, C: 0 };
+
+  for (const group of groups) {
+    const answer = answers[group.id];
+    if (!answer) continue;
+    const mostDim = group.adjectives[answer.most].dimension;
+    const leastDim = group.adjectives[answer.least].dimension;
+    mostCount[mostDim]++;
+    leastCount[leastDim]++;
+  }
+
+  const total = groups.length;
+  const dims: Dimension[] = ['D', 'I', 'S', 'C'];
+  const scores: Scores = { D: 0, I: 0, S: 0, C: 0 };
+
+  for (const dim of dims) {
+    scores[dim] = Math.round(((mostCount[dim] - leastCount[dim] + total) / (total * 2)) * 100);
+  }
+
+  return scores;
+}
+
+// ─── Delta Analysis ─────────────────────────────────────────
+
+const DELTA_TEXTS: Record<Dimension, {
+  increase: { fr: string; en: string };
+  decrease: { fr: string; en: string };
+}> = {
+  D: {
+    increase: {
+      fr: 'Vous amplifiez votre assertivité et votre directivité dans votre environnement actuel.',
+      en: 'You amplify your assertiveness and directness in your current environment.',
+    },
+    decrease: {
+      fr: 'Vous tempérez votre côté directif et compétitif au quotidien.',
+      en: 'You temper your directive and competitive side day-to-day.',
+    },
+  },
+  I: {
+    increase: {
+      fr: 'Vous faites un effort conscient pour être plus communicatif et expressif.',
+      en: 'You make a conscious effort to be more communicative and expressive.',
+    },
+    decrease: {
+      fr: 'Vous retenez votre enthousiasme naturel et êtes plus réservé que votre nature profonde.',
+      en: 'You hold back your natural enthusiasm and are more reserved than your true nature.',
+    },
+  },
+  S: {
+    increase: {
+      fr: 'Vous cultivez davantage de patience et de stabilité que ce que votre nature suggère.',
+      en: 'You cultivate more patience and stability than your nature suggests.',
+    },
+    decrease: {
+      fr: 'Vous réduisez votre besoin naturel de stabilité pour vous adapter au changement.',
+      en: 'You reduce your natural need for stability to adapt to change.',
+    },
+  },
+  C: {
+    increase: {
+      fr: 'Vous renforcez votre rigueur et votre attention aux détails au-delà de votre tendance naturelle.',
+      en: 'You strengthen your rigor and attention to detail beyond your natural tendency.',
+    },
+    decrease: {
+      fr: 'Vous assouplissez vos exigences de précision et acceptez plus de flexibilité.',
+      en: 'You relax your precision requirements and accept more flexibility.',
+    },
+  },
+};
+
+function calculateDeltas(
+  adapted: Scores,
+  natural: Scores,
+  locale: 'fr' | 'en',
+): { deltas: Scores; interpretations: DeltaInterpretation[] } {
+  const dims: Dimension[] = ['D', 'I', 'S', 'C'];
+  const deltas: Scores = { D: 0, I: 0, S: 0, C: 0 };
+  const interpretations: DeltaInterpretation[] = [];
+
+  for (const dim of dims) {
+    const delta = adapted[dim] - natural[dim];
+    deltas[dim] = delta;
+
+    const absDelta = Math.abs(delta);
+    let level: DeltaInterpretation['level'] = 'low';
+    if (absDelta > 30) level = 'very-high';
+    else if (absDelta > 20) level = 'high';
+    else if (absDelta > 10) level = 'moderate';
+
+    const direction: DeltaInterpretation['direction'] =
+      delta > 5 ? 'increase' : delta < -5 ? 'decrease' : 'stable';
+
+    const dimTexts = DELTA_TEXTS[dim];
+    let text: { fr: string; en: string };
+    if (direction === 'stable') {
+      text = {
+        fr: `Votre profil ${dim} est cohérent entre votre style naturel et adapté.`,
+        en: `Your ${dim} profile is consistent between your natural and adapted style.`,
+      };
+    } else {
+      text = dimTexts[direction];
+    }
+
+    interpretations.push({ dimension: dim, delta, level, direction, text });
+  }
+
+  return { deltas, interpretations };
+}
+
+// ─── Spranger Values Scoring (Phase 3) ──────────────────────
+
+const SPRANGER_LABELS: Record<SprangerMotivation, { fr: string; en: string }> = {
+  cognitive: { fr: 'Cognitive', en: 'Cognitive' },
+  aesthetic: { fr: 'Esthétique', en: 'Aesthetic' },
+  utilitarian: { fr: 'Utilitaire', en: 'Utilitarian' },
+  altruistic: { fr: 'Altruiste', en: 'Altruistic' },
+  individual: { fr: 'Individualiste', en: 'Individualistic' },
+  traditional: { fr: 'Traditionnelle', en: 'Traditional' },
+};
+
+/**
+ * Calculate Spranger value scores from forced-pair answers.
+ * Each motivation is scored as: (times_picked / times_appeared) * 100
+ */
+export function calculateSprangerScores(
+  answers: Record<number, 0 | 1>,
+  pairs: SprangerPair[],
+): ValuesResult {
+  const counts: Record<SprangerMotivation, number> = {
+    cognitive: 0, aesthetic: 0, utilitarian: 0,
+    altruistic: 0, individual: 0, traditional: 0,
+  };
+  const appearances: Record<SprangerMotivation, number> = {
+    cognitive: 0, aesthetic: 0, utilitarian: 0,
+    altruistic: 0, individual: 0, traditional: 0,
+  };
+
+  for (const pair of pairs) {
+    const answer = answers[pair.id];
+    if (answer === undefined) continue;
+    appearances[pair.optionA.motivation]++;
+    appearances[pair.optionB.motivation]++;
+    if (answer === 0) counts[pair.optionA.motivation]++;
+    else counts[pair.optionB.motivation]++;
+  }
+
+  const scores: SprangerScores = {
+    cognitive: Math.round((counts.cognitive / Math.max(appearances.cognitive, 1)) * 100),
+    aesthetic: Math.round((counts.aesthetic / Math.max(appearances.aesthetic, 1)) * 100),
+    utilitarian: Math.round((counts.utilitarian / Math.max(appearances.utilitarian, 1)) * 100),
+    altruistic: Math.round((counts.altruistic / Math.max(appearances.altruistic, 1)) * 100),
+    individual: Math.round((counts.individual / Math.max(appearances.individual, 1)) * 100),
+    traditional: Math.round((counts.traditional / Math.max(appearances.traditional, 1)) * 100),
+  };
+
+  const bipolar = (a: number, b: number): number => {
+    const total = a + b;
+    if (total === 0) return 0;
+    return Math.round(((b - a) / total) * 100);
+  };
+
+  const bipolarIndicators: BipolarIndicator[] = [
+    {
+      id: 'knowledge-utility',
+      leftLabel: { fr: 'Savoir & compréhension', en: 'Knowledge & understanding' },
+      rightLabel: { fr: 'Utilité & rendement', en: 'Utility & efficiency' },
+      value: bipolar(scores.cognitive, scores.utilitarian),
+    },
+    {
+      id: 'beauty-tradition',
+      leftLabel: { fr: 'Beauté & harmonie', en: 'Beauty & harmony' },
+      rightLabel: { fr: 'Tradition & principes', en: 'Tradition & principles' },
+      value: bipolar(scores.aesthetic, scores.traditional),
+    },
+    {
+      id: 'self-others',
+      leftLabel: { fr: 'Accomplissement personnel', en: 'Personal achievement' },
+      rightLabel: { fr: 'Service aux autres', en: 'Service to others' },
+      value: bipolar(scores.individual, scores.altruistic),
+    },
+  ];
+
+  const sortedValues = (Object.entries(scores) as [SprangerMotivation, number][])
+    .sort((a, b) => b[1] - a[1])
+    .map(([key, score]) => ({ key, label: SPRANGER_LABELS[key], score }));
+
+  return { scores, bipolarIndicators, sortedValues };
 }
