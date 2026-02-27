@@ -70,6 +70,65 @@ export interface Translation {
     copied: string;
     invalidUrl: string;
   };
+  report: {
+    tabs: {
+      overview: string;
+      profile: string;
+      talents: string;
+      environment: string;
+      perceptions: string;
+      communication: string;
+      motivation: string;
+      improvement: string;
+      indicators: string;
+      opposite: string;
+    };
+    overview: {
+      yourType: string;
+      position: string;
+    };
+    profile: {
+      title: string;
+      subtitle: string;
+    };
+    talents: {
+      title: string;
+      subtitle: string;
+    };
+    environment: {
+      title: string;
+      subtitle: string;
+    };
+    perceptions: {
+      title: string;
+      subtitle: string;
+      selfTitle: string;
+      stressTitle: string;
+    };
+    communication: {
+      doTitle: string;
+      dontTitle: string;
+      subtitle: string;
+    };
+    motivation: {
+      title: string;
+      subtitle: string;
+    };
+    improvement: {
+      title: string;
+      subtitle: string;
+      cta: string;
+    };
+    indicators: {
+      title: string;
+      subtitle: string;
+    };
+    opposite: {
+      title: string;
+      subtitle: string;
+      interactTitle: string;
+    };
+  };
   loading: string;
   questions: Record<number, string>;
   profiles: Record<Dimension, ProfileText>;
@@ -143,6 +202,65 @@ export const translations: Record<Locale, Translation> = {
       share: 'Partager la vue équipe',
       copied: 'Lien copié !',
       invalidUrl: 'URL invalide — utilise une URL de partage DISC.',
+    },
+    report: {
+      tabs: {
+        overview: 'Vue d\'ensemble',
+        profile: 'Votre profil',
+        talents: 'Talents',
+        environment: 'Environnement',
+        perceptions: 'Perceptions',
+        communication: 'Communication',
+        motivation: 'Motivation',
+        improvement: 'Amélioration',
+        indicators: 'Indicateurs',
+        opposite: 'Votre opposé',
+      },
+      overview: {
+        yourType: 'Votre type',
+        position: 'Position sur la roue',
+      },
+      profile: {
+        title: 'Votre profil en détail',
+        subtitle: 'Description approfondie de votre style comportemental',
+      },
+      talents: {
+        title: 'Vos talents pour l\'entreprise',
+        subtitle: 'Les compétences naturelles que vous apportez',
+      },
+      environment: {
+        title: 'Votre environnement idéal',
+        subtitle: 'Les conditions dans lesquelles vous donnez le meilleur de vous-même',
+      },
+      perceptions: {
+        title: 'Perceptions',
+        subtitle: 'Comment vous vous percevez et comment les autres peuvent vous percevoir',
+        selfTitle: 'En temps normal, vous vous percevez comme…',
+        stressTitle: 'Sous stress, les autres peuvent vous voir comme…',
+      },
+      communication: {
+        doTitle: 'Mieux communiquer avec vous',
+        dontTitle: 'À éviter avec vous',
+        subtitle: 'Les clés pour des échanges efficaces avec votre profil',
+      },
+      motivation: {
+        title: 'Vos clés de motivation',
+        subtitle: 'Ce qui vous pousse à donner le meilleur de vous-même',
+      },
+      improvement: {
+        title: 'Domaines d\'amélioration',
+        subtitle: 'Ces pistes ne sont pas des faiblesses mais des axes de développement. Choisissez 1 à 3 priorités.',
+        cta: 'Choisissez 1 à 3 axes prioritaires',
+      },
+      indicators: {
+        title: 'Indicateurs bipolaires',
+        subtitle: 'Votre positionnement entre différents pôles comportementaux',
+      },
+      opposite: {
+        title: 'Votre profil opposé',
+        subtitle: 'Le type diamétralement opposé au vôtre sur la roue DISC',
+        interactTitle: 'Comment mieux interagir avec votre opposé',
+      },
     },
     loading: 'Analyse de ton profil en cours…',
     questions: {
@@ -283,6 +401,65 @@ export const translations: Record<Locale, Translation> = {
       share: 'Share team view',
       copied: 'Link copied!',
       invalidUrl: 'Invalid URL — use a DISC share URL.',
+    },
+    report: {
+      tabs: {
+        overview: 'Overview',
+        profile: 'Your profile',
+        talents: 'Talents',
+        environment: 'Environment',
+        perceptions: 'Perceptions',
+        communication: 'Communication',
+        motivation: 'Motivation',
+        improvement: 'Improvement',
+        indicators: 'Indicators',
+        opposite: 'Your opposite',
+      },
+      overview: {
+        yourType: 'Your type',
+        position: 'Wheel position',
+      },
+      profile: {
+        title: 'Your profile in detail',
+        subtitle: 'In-depth description of your behavioral style',
+      },
+      talents: {
+        title: 'Your talents for the workplace',
+        subtitle: 'The natural skills you bring to the table',
+      },
+      environment: {
+        title: 'Your ideal environment',
+        subtitle: 'The conditions where you perform at your best',
+      },
+      perceptions: {
+        title: 'Perceptions',
+        subtitle: 'How you see yourself and how others may see you',
+        selfTitle: 'Normally, you see yourself as…',
+        stressTitle: 'Under stress, others may see you as…',
+      },
+      communication: {
+        doTitle: 'Better communicate with you',
+        dontTitle: 'What to avoid with you',
+        subtitle: 'Keys for effective exchanges with your profile',
+      },
+      motivation: {
+        title: 'Your motivation keys',
+        subtitle: 'What drives you to give your best',
+      },
+      improvement: {
+        title: 'Areas for improvement',
+        subtitle: 'These are not weaknesses but development areas. Choose 1 to 3 priorities.',
+        cta: 'Choose 1 to 3 priority areas',
+      },
+      indicators: {
+        title: 'Bipolar indicators',
+        subtitle: 'Your positioning between different behavioral poles',
+      },
+      opposite: {
+        title: 'Your opposite profile',
+        subtitle: 'The type diametrically opposite to yours on the DISC wheel',
+        interactTitle: 'How to better interact with your opposite',
+      },
     },
     loading: 'Analyzing your profile…',
     questions: {
