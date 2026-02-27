@@ -1,44 +1,8 @@
 ---
-import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
 import App from '../components/App.tsx';
 ---
 
-<html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Découvre ton profil DISC en 3 minutes. Test gratuit, sans inscription, avec résultats détaillés et conseils personnalisés."
-    />
-    <meta property="og:title" content="Découvre ton profil DISC" />
-    <meta property="og:description" content="Test DISC gratuit en 3 minutes. Découvre ton style comportemental dominant." />
-    <meta property="og:type" content="website" />
-    <title>Test DISC — Découvre ton profil comportemental</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <script is:inline>
-      const theme = localStorage.getItem('disc-theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (theme === 'dark' || (!theme && prefersDark)) {
-        document.documentElement.classList.add('dark');
-      }
-    </script>
-  </head>
-  <body class="bg-white dark:bg-[#202124]">
-    <!-- Blob Background -->
-    <div class="bg-blobs">
-      <div class="bg-blob bg-blob--d"></div>
-      <div class="bg-blob bg-blob--i"></div>
-      <div class="bg-blob bg-blob--s"></div>
-      <div class="bg-blob bg-blob--c"></div>
-    </div>
-
-    <App client:load />
-  </body>
-</html>
+<Layout>
+  <App client:load />
+</Layout>

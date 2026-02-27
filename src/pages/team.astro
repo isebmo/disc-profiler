@@ -1,0 +1,8 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Team from '../components/Team.tsx';
+---
+
+<Layout title="Vue équipe DISC" description="Rassemble les profils DISC de ton équipe pour une vue d'ensemble.">
+  <Team client:load />
+</Layout>
